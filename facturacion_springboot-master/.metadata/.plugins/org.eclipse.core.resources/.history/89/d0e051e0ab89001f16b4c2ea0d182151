@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://wwww.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="layaout/layaout :: head"></head>
+<style>/* Hacer que todo el body sea transparente */
+body {
+    background-color: transparent !important; /* Fondo completamente transparente */
+}
+
+/* Estilo para formularios, tablas y contenedores */
+form, .table, .table-container {
+    background-color: transparent !important; /* Fondo transparente para formularios y tablas */
+    border: none !important; /* Sin bordes */
+}
+
+/* Para que todas las filas de la tabla sean transparentes */
+.table tr {
+    background-color: transparent !important; /* Fondo transparente para cada fila */
+}
+
+/* Fondo transparente para las celdas */
+.table td, .table th {
+    background-color: transparent !important; /* Fondo transparente para las celdas y encabezados */
+    border: none !important; /* Sin bordes visibles en las celdas */
+}
+
+/* Estilos para los botones */
+.btn {
+    background-color: transparent !important; /* Botones sin fondo */
+    border-width: 2px; /* Borde de los botones */
+    border-style: solid; /* Bordes sólidos */
+    font-weight: bold; /* Texto en negrita */
+    padding: 5px 10px; /* Espaciado interno */
+}
+
+/* Bordes y colores de los botones */
+.btn-success {
+    border-color: green; /* Borde verde para "Crear Factura" */
+    color: green; /* Texto verde */
+}
+
+.btn-warning {
+    border-color: orange; /* Borde naranja para "Editar Cliente" */
+    color: orange; /* Texto naranja */
+}
+
+.btn-danger {
+    border-color: red; /* Borde rojo para "Eliminar Cliente" */
+    color: red; /* Texto rojo */
+}
+
+/* Efecto hover en los botones */
+.btn:hover {
+    opacity: 0.7; /* Transparencia al hacer hover */
+    transition: opacity 0.3s ease; /* Transición suave */
+}
+
+/* Estilo de la paginación */
+.page-link {
+    background-color: transparent !important; /* Fondo transparente en paginación */
+    border: none !important; /* Sin bordes */
+    color: #007bff; /* Color del texto */
+}
+
+.page-item.active .page-link {
+    background-color: #007bff !important; /* Color de fondo al estar activo */
+    color: white !important; /* Texto blanco cuando esté activo */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Si tienes un contenedor que rodea todo, asegúrate de que también sea transparente */
+.container {
+    background-color: transparent !important; /* Fondo transparente para el contenedor */
+    border: none !important; /* Sin bordes */
+}
+</style>
+<body>
+	<header th:replace="layaout/layaout :: header"></header>
+	<div class="container">
+		<div class="card bg-light m-4">
+			<div class="card-header bg-primary text-white" th:text="${titulo}"></div>
+			<div class="card-body">
+				<table class="table table-striped m-3">
+					<thead class="bg-dark text-white">
+						<tr>
+							<th sec:authorize="hasRole('ROLE_USER')">ID</th>
+							<th>Nombre</th>
+							<th>Apellido</th>
+							<th>Email</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Crear Factura</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Editar Cliente</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Eliminar Cliente</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="cliente: ${clientes}">
+							<td sec:authorize="hasRole('ROLE_USER')"><a class="btn btn-primary btn-xs"
+								th:href="@{/ver/} + ${cliente.id}" th:text="${cliente.id}"></a></td>
+							<td th:text="${cliente.nombre}"></td>
+							<td th:text="${cliente.apellido}"></td>
+							<td th:text="${cliente.email}"></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-success btn-xs"
+								th:href="@{'/factura/form/' + ${cliente.id}}"
+								th:text="'Crear Factura'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-warning btn-xs"
+								th:href="@{/form/} + ${cliente.id}" th:text="'Editar Cliente'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-danger btn-xs"
+								th:href="@{/eliminar/} + ${cliente.id}"
+								th:text="'Eliminar Cliente'"></a></td>
+						</tr>
+					</tbody>
+				</table>
+				<nav th:replace="paginator-nav :: paginator"></nav>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="layaout/layaout :: footer"></footer>
+</body>
+</html>

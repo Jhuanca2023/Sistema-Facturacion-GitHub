@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://wwww.thymeleaf.org">
+<head th:replace="layaout/layaout :: head">
+    <!-- Bootstrap CDN for additional styles -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Full-screen background video */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+        }
+
+        /* Transparent card style */
+        .card {
+            background-color: rgba(255, 255, 255, 0.8); /* semi-transparent white */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .card-header {
+            background-color: rgba(0, 123, 255, 0.8); /* semi-transparent blue */
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 50px;
+            padding-left: 40px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+
+        .btn {
+            border-radius: 50px;
+        }
+
+        .btn-primary {
+            background-color: rgba(0, 123, 255, 0.8); /* semi-transparent blue */
+            border-color: rgba(0, 123, 255, 0.8);
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(0, 86, 179, 0.8);
+            border-color: rgba(0, 86, 179, 0.8);
+        }
+
+        .container {
+            margin-top: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background video -->
+    <video id="bg-video" autoplay muted loop>
+        <source src="https://media.istockphoto.com/id/1497221920/es/v%C3%ADdeo/problema-de-an%C3%A1lisis-gr%C3%A1fico-interactivo-del-inversor-el-techo-de-la-deuda-se-prepara-para-el.mp4?s=mp4-640x640-is&k=20&c=7a0aQuWSEHYc28JqAJoJazDd1Ri0oyAgI2HseeCXnbs=" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+
+    <header th:replace="layaout/layaout :: header"></header>
+    <div class="container py-4">
+        <div class="card border-primary text-center mx-auto" style="max-width: 400px;">
+            <div class="card-header">Login</div>
+            <div class="card-body">
+                <form th:action="@{/login}" method="post">
+                    <div class="form-group col-sm-12 mt-3">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" id="username" class="form-control"
+                               placeholder="Username" autofocus required />
+                    </div>
+                    <div class="form-group col-sm-12 mt-3">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" id="password" class="form-control"
+                               placeholder="Password" required />
+                    </div>
+                    <div class="form-group col-sm-12 mt-4 d-grid gap-2">
+                        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Login" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="layaout/layaout :: footer"></footer>
+</body>
+</html>

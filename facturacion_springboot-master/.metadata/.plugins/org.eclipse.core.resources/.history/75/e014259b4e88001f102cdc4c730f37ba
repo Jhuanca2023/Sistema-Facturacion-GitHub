@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://wwww.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="layaout/layaout :: head"></head>
+<body>
+	<header th:replace="layaout/layaout :: header"></header>
+	<div class="container">
+		<div class="card bg-light m-4">
+			<div class="card-header bg-primary text-white" th:text="${titulo}"></div>
+			<div class="card-body">
+				<table class="table table-striped m-3">
+					<thead class="bg-dark text-white">
+						<tr>
+							<th>Nombre</th>
+							<th>Precio</th>
+							-------agregre----------
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Carrito</th>
+
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Editar Producto</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Eliminar Producto</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="producto: ${productos}">
+							<td th:text="${producto.nombre}"></td>
+							<td th:text="${producto.precio}"></td>
+							-------agregre----------
+							<td>
+							                                <a class="btn btn-success" th:href="@{/carrito/agregar/} + ${producto.id}">
+							                                    <i class="fas fa-shopping-cart"></i>
+							                                    Añadir al Carrito
+							                                </a>
+							                            </td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a
+								class="btn btn-warning btn-xs"
+								th:href="@{/producto/form/} + ${producto.id}"
+								th:text="'Editar Producto'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a
+								class="btn btn-danger btn-xs"
+								th:href="@{/producto/eliminar/} + ${producto.id}"
+								th:text="'Eliminar Producto'"></a></td>
+						</tr>
+					</tbody>
+				</table>
+				<nav th:replace="paginator-nav :: paginator"></nav>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="layaout/layaout :: footer"></footer>
+</body>
+</html>

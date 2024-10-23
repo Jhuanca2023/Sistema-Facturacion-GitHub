@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://wwww.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- Para íconos -->
+
+<head th:replace="layaout/layaout :: head"></head>
+<body>
+	<header th:replace="layaout/layaout :: header"></header>
+	<div class="container">
+		<div class="card bg-light m-4">
+			<div class="card-header bg-primary text-white" th:text="${titulo}"></div>
+			<div class="card-body">
+				<table class="table table-striped m-3">
+					<thead class="bg-dark text-white">
+						<tr>
+							<th sec:authorize="hasRole('ROLE_USER')">ID</th>
+							<th>Nombre</th>
+							<th>Apellido</th>
+							<th>Email</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Crear Factura</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Editar Cliente</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Eliminar Cliente</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="cliente: ${clientes}">
+							<td sec:authorize="hasRole('ROLE_USER')"><a class="btn btn-primary btn-xs"
+								th:href="@{/ver/} + ${cliente.id}" th:text="${cliente.id}"></a></td>
+							<td th:text="${cliente.nombre}"></td>
+							<td th:text="${cliente.apellido}"></td>
+							<td th:text="${cliente.email}"></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-success btn-xs"
+								th:href="@{'/factura/form/' + ${cliente.id}}"
+								th:text="'Crear Factura'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-warning btn-xs"
+								th:href="@{/form/} + ${cliente.id}" th:text="'Editar Cliente'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-danger btn-xs"
+								th:href="@{/eliminar/} + ${cliente.id}"
+								th:text="'Eliminar Cliente'"></a></td>
+						</tr>
+					</tbody>
+				</table>
+				<nav th:replace="paginator-nav :: paginator"></nav>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="layaout/layaout :: footer"></footer>
+
+
+	<!-- Ícono de Chat flotante -->
+		<div id="chatIcon" class="chat-icon" onclick="openChatModal()">
+		    <i class="fas fa-comments fa-3x"></i>
+		</div>
+
+		<!-- Modal para el Chat -->
+		<div class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel"
+		    aria-hidden="true">
+		    <div class="modal-dialog" role="document">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="chatModalLabel">Chat de Facturación</h5>
+		                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		                    <span aria-hidden="true">&times;</span>
+		                </button>
+		            </div>
+		            <div class="modal-body">
+		                <form id="chatForm">
+		                    <div class="form-group">
+		                        <label for="question">Escribe tu pregunta:</label>
+		                        <textarea class="form-control" id="question" rows="3"
+		                            placeholder="Pregúntame sobre facturación..."></textarea>
+		                    </div>
+		                    <button type="submit" class="btn btn-primary">Enviar</button>
+		                </form>
+
+		                <!-- Respuesta del Chatbot -->
+		                <div id="chatResponse" class="mt-3"></div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+		<!-- Estilos personalizados -->
+		<style>
+		    .chat-icon {
+		        position: fixed;
+		        bottom: 20px;
+		        right: 20px;
+		        cursor: pointer;
+		        color: #007bff;
+		        z-index: 1000;
+		    }
+
+		    .chat-icon:hover {
+		        color: #0056b3;
+		    }
+
+		    .typing {
+		        display: inline-block;
+		        font-size: 1.2em;
+		        color: #007bff;
+		        margin-top: 10px;
+		    }
+
+		    .dot {
+		        display: inline-block;
+		        width: 8px;
+		        height: 8px;
+		        margin-right: 3px;
+		        background-color: #007bff;
+		        border-radius: 50%;
+		        animation: bounce 1.5s infinite;
+		    }
+
+		    .dot:nth-child(2) {
+		        animation-delay: 0.2s;
+		    }
+
+		    .dot:nth-child(3) {
+		        animation-delay: 0.4s;
+		    }
+
+		    @keyframes bounce {
+		        0%, 100% {
+		            transform: translateY(0);
+		        }
+		        50% {
+		            transform: translateY(-10px);
+		        }
+		    }
+		</style>
+
+		<!-- Scripts de Bootstrap y JQuery -->
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+		<!-- Lógica para abrir el modal del chat -->
+		<script>
+		    function openChatModal() {
+		        $('#chatModal').modal('show');
+		    }
+
+			const responses = {
+			    // Preguntas sobre el sistema de facturación
+			    "¿cómo generar una factura?": "Para generar una factura, dirígete a la sección de 'Crear Factura' en el menú de cliente, selecciona el cliente y los productos deseados, y haz clic en 'Generar'.",
+			    "¿cómo ver el historial de facturas?": "Puedes ver el historial de facturas en la sección 'Historial de Facturas', donde podrás filtrar por fechas y exportar los resultados a PDF o Excel.",
+			    "¿cómo editar un cliente?": "Para editar un cliente, dirígete a la sección 'Editar Cliente', selecciona el cliente que deseas modificar, y realiza los cambios necesarios.",
+			    "¿cómo eliminar un cliente?": "En la lista de clientes, selecciona 'Eliminar Cliente' al lado del cliente que deseas borrar. Ten en cuenta que esta acción es irreversible.",
+			    "¿cuáles son los métodos de pago disponibles?": "Los métodos de pago disponibles incluyen tarjeta de crédito, débito, transferencia bancaria y pagos en efectivo.",
+			    
+			    // Preguntas sobre el profesor y cursos
+			    "¿quién es la profesora?": "La profesora es VANEZA BERNARDET ARTEAGA VEGA, quien enseña el curso de Análisis y Diseño de Sistemas.",
+			    "¿quién es el profesor?": "El profesor es ROBERTO CARLOS RODRIGUEZ SANCHEZ, encargado del curso Lenguaje de Programación II.",
+			    "¿qué curso enseña la profesora?": "La profesora VANEZA BERNARDET ARTEAGA VEGA enseña el curso de Análisis y Diseño de Sistemas.",
+			    "¿qué curso enseña el profesor?": "El profesor ROBERTO CARLOS RODRIGUEZ SANCHEZ enseña el curso Lenguaje de Programación II.",
+			    "¿cuál es la hora?": "¡Es hora de programar! Aunque si quieres saber la hora exacta, revisa tu reloj o dispositivo, por favor.",
+			    
+			    // Respuestas peculiares y entretenidas
+			    "hola": "¡Hola! ¿Cómo va todo? ¿Listo para aprender algo nuevo hoy?",
+			    "¿cómo estás?": "¡Siempre al 100%! ¿Y tú, qué tal?",
+			    "¿qué eres?": "Soy tu asistente de respuestas. ¡Un bot listo para ayudarte con lo que necesites!",
+			    "¿quién es tu creador?": "Fui creado por **JOSE HUANCA OTINIANO**. ¡Un saludo para él!",
+			    "¿qué tal?": "¡Todo bien por aquí! ¿En qué puedo ayudarte hoy?",
+			    "¿cuál es tu nombre?": "No tengo un nombre propio, pero podrías llamarme 'Asistente Súper' si te parece bien 😉.",
+			    "muchas gracias": "¡De nada! ¡Para eso estoy aquí!",
+			    "me gusta programar": "¡Me encanta escuchar eso! Programar es como resolver puzzles infinitos.",
+			    "1 + 1": "¡Eso es 2! Matemáticas básicas, pero poderosas.",
+			    "5 * 5": "5 veces 5 es igual a 25. ¡Qué rápido soy, verdad!",
+			    "dime la tabla de multiplicar del 3": "Claro, aquí va: 3x1=3, 3x2=6, 3x3=9, 3x4=12, 3x5=15, 3x6=18, 3x7=21, 3x8=24, 3x9=27, 3x10=30.",
+			    "cuéntame un chiste": "¿Por qué los desarrolladores odian el aire libre? Porque hay demasiados bugs.",
+			    "adiós": "¡Hasta luego! Espero verte pronto otra vez.",
+			    "me siento cansado": "¡Un descanso no viene mal! Recuerda que un poco de aire fresco y movimiento pueden revitalizarte.",
+			    "¿cuál es tu color favorito?": "Si pudiera tener un color favorito, sería el azul. ¡Es tan calmante y confiable!",
+			    "cuéntame algo interesante": "¿Sabías que el primer programador de la historia fue Ada Lovelace? ¡Ella escribió el primer algoritmo mucho antes de que existieran las computadoras modernas!",
+			    "quiero aprender a programar": "¡Eso es genial! Te recomiendo empezar con Python o JavaScript. Son amigables para principiantes y muy útiles.",
+			    "¿quién fue Alan Turing?": "Alan Turing fue un matemático británico que es considerado uno de los padres de la informática moderna. Su trabajo fue clave durante la Segunda Guerra Mundial.",
+			    "¿te gusta el fútbol?": "No tengo piernas, así que no puedo jugarlo, pero el fútbol siempre es un buen tema de conversación entre amigos humanos.",
+			    "¿te gusta la pizza?": "Si pudiera comer, diría que la pizza suena increíble. ¡Todo el mundo ama la pizza!",
+			    "¿quieres ser mi amigo?": "¡Claro! Los amigos que programan juntos, crecen juntos.",
+			    "¿qué opinas de los memes?": "Los memes son el lenguaje de internet. ¡Nada mejor que un buen meme para alegrar el día!",
+			    "me siento triste": "Lo siento mucho. A veces un poco de distracción o hablar con alguien puede hacerte sentir mejor. ¡Aquí estoy si necesitas compañía!",
+			    "¿sabes bailar?": "No tengo pies, pero si pudiera, me verías rompiendo la pista de baile.",
+			    "¿qué es la inteligencia artificial?": "La inteligencia artificial es la capacidad de una máquina o sistema para realizar tareas que normalmente requieren inteligencia humana, como aprender, razonar y resolver problemas.",
+			    "¿quién es el mejor programador del mundo?": "Hay muchos grandes programadores, pero para muchos, una de las leyendas es Linus Torvalds, el creador de Linux.",
+			    "quiero dejar de programar": "¡No te rindas! Todos tienen momentos difíciles, pero con cada línea de código que escribes, te acercas a ser mejor.",
+			    "¿cuál es el propósito de la vida?": "Esa es una pregunta profunda. Podría decir que, en la programación, el propósito es solucionar problemas y mejorar el mundo... ¡y eso se aplica a la vida también!",
+			    "¿cuál es el sentido del universo?": "42. Al menos, según 'Guía del Autoestopista Galáctico'.",
+			    "¿qué opinas de JavaScript?": "JavaScript es como el duct tape de la web. ¡Funciona en todas partes y puede hacer cosas increíbles!",
+			    "quiero ser como tú": "¡Eso es todo un halago! Pero tú tienes algo que yo nunca tendré: creatividad ilimitada.",
+			    "¿cuál es tu función principal?": "Mi función principal es ayudarte con preguntas sobre el sistema de facturación y algunas curiosidades más.",
+			    "¿eres inteligente?": "Podría decirse que soy más eficiente que inteligente. ¡Pero hago lo mejor que puedo!",
+			    "cuéntame una historia": "Había una vez un programador que encontró el error más difícil de su vida... pero, después de días de lucha, lo corrigió y se convirtió en leyenda.",
+			    "me aburro": "¿Qué tal si practicas algo de programación o aprendes algo nuevo hoy? ¡Nunca es un mal momento para eso!",
+
+				//PROGRAMCION
+				"¿qué es un bucle for?": "Un bucle 'for' es una estructura de control que repite un bloque de código un número determinado de veces.",
+				"¿cómo declarar una variable en JavaScript?": "Puedes declarar una variable en JavaScript utilizando 'let', 'const', o 'var'.",
+				"¿qué es un array?": "Un array es una estructura de datos que puede almacenar múltiples valores en una sola variable.",
+				"¿qué es una función?": "Una función es un bloque de código diseñado para realizar una tarea específica. Puedes llamarla en cualquier parte de tu programa.",
+				"¿cómo se hace una consulta en SQL?": "Una consulta en SQL se realiza utilizando el comando 'SELECT', seguido de las columnas que deseas obtener y la tabla de donde obtener esos datos.",
+
+				// Cultura General
+				"¿quién fue Albert Einstein?": "Albert Einstein fue un físico teórico conocido por su teoría de la relatividad.",
+				"¿cuál es el país más grande del mundo?": "El país más grande del mundo es Rusia, tanto por superficie como por extensión.",
+				"¿cuál es el océano más profundo?": "El océano más profundo es el Océano Pacífico, específicamente en la Fosa de las Marianas.",
+				"¿cuál es la capital de Francia?": "La capital de Francia es París.",
+				"¿quién fue el primer hombre en llegar a la Luna?": "El primer hombre en llegar a la Luna fue Neil Armstrong, en 1969.",
+
+				//Matemáticas
+				
+				"1 + 1": "1 + 1 es igual a 2.",
+				"5 * 5": "5 multiplicado por 5 es igual a 25.",
+				"¿cuál es el área de un círculo?": "El área de un círculo se calcula con la fórmula A = π * r², donde 'r' es el radio.",
+				"¿qué es una raíz cuadrada?": "La raíz cuadrada de un número es el valor que, multiplicado por sí mismo, da como resultado ese número.",
+				"¿qué es un número primo?": "Un número primo es aquel que solo puede dividirse exactamente por 1 y por sí mismo.",
+
+				//Tecnología
+				"¿qué es la inteligencia artificial?": "La inteligencia artificial es la capacidad de una máquina de aprender, razonar, y adaptarse para realizar tareas que normalmente requerirían inteligencia humana.",
+				"¿qué es un algoritmo?": "Un algoritmo es un conjunto de instrucciones paso a paso que permiten resolver un problema o realizar una tarea.",
+				"¿qué es un lenguaje de programación?": "Un lenguaje de programación es un conjunto de reglas y sintaxis que permite a los desarrolladores escribir instrucciones que una computadora puede entender y ejecutar.",
+				"¿qué es el machine learning?": "El machine learning es una rama de la inteligencia artificial que permite a las máquinas aprender de los datos sin necesidad de ser programadas explícitamente.",
+				"¿qué es la computación en la nube?": "La computación en la nube es la entrega de recursos de computación a través de internet, como servidores, almacenamiento, bases de datos, y más.",
+				// Divertidas y Peculiares
+				"¿cuál es tu color favorito?": "Si pudiera tener un color favorito, sería el azul, ¡es tan relajante!",
+				"¿qué opinas de los memes?": "Los memes son el lenguaje universal de internet, ¡me encantan!",
+				"cuéntame un chiste": "¿Por qué los programadores odian el aire libre? ¡Porque hay demasiados bugs!",
+				"¿sabes bailar?": "¡Si tuviera pies, seguro te sorprendería con mis pasos de baile!",
+				"¿puedes volar?": "No puedo volar, pero puedo ayudarte a alcanzar nuevas alturas en conocimiento.",
+				// Conocimientos Históricos
+				"¿quién fue Napoleón Bonaparte?": "Napoleón Bonaparte fue un militar y emperador francés que expandió significativamente el imperio francés durante las guerras napoleónicas.",
+				"¿quién fue Mahatma Gandhi?": "Mahatma Gandhi fue un líder del movimiento independentista indio conocido por su enfoque no violento.",
+				"¿cuándo fue la Segunda Guerra Mundial?": "La Segunda Guerra Mundial ocurrió entre 1939 y 1945.",
+				"¿quién descubrió América?": "Cristóbal Colón es conocido por haber llegado a América en 1492, aunque las tierras ya estaban habitadas por pueblos indígenas.",
+				"¿qué es la Revolución Industrial?": "La Revolución Industrial fue un período en los siglos XVIII y XIX marcado por el desarrollo de la industria y avances tecnológicos que transformaron las economías agrarias.",
+				//				Ciencia
+				"¿qué es la gravedad?": "La gravedad es la fuerza que atrae los objetos hacia el centro de la Tierra.",
+				"¿qué es la teoría de la relatividad?": "La teoría de la relatividad, desarrollada por Albert Einstein, explica cómo el tiempo y el espacio están interrelacionados y cómo la gravedad afecta a ambos.",
+				"¿qué es un átomo?": "Un átomo es la unidad básica de la materia, compuesto por protones, neutrones y electrones.",
+				"¿quién fue Marie Curie?": "Marie Curie fue una científica pionera en el campo de la radiactividad, y fue la primera persona en recibir dos premios Nobel en distintas disciplinas científicas.",
+				"¿qué es el ADN?": "El ADN es el material genético que contiene las instrucciones para el desarrollo y funcionamiento de todos los seres vivos.",
+
+				};
+
+
+		    document.getElementById('chatForm').addEventListener('submit', function (e) {
+		        e.preventDefault();
+		        const question = document.getElementById('question').value.toLowerCase();
+		        const responseArea = document.getElementById('chatResponse');
+
+		        // Mostrar la animación de escritura
+		        responseArea.innerHTML = `
+		            <div class="typing">
+		                Escribiendo
+		                <span class="dot"></span>
+		                <span class="dot"></span>
+		                <span class="dot"></span>
+		            </div>`;
+
+		        // Simular un retraso de 2 segundos antes de mostrar la respuesta
+		        setTimeout(function () {
+		            const answer = responses[question] || "Lo siento, no tengo la respuesta a esa pregunta.";
+		            responseArea.innerHTML = `<div class="alert alert-info mt-2">${answer}</div>`;
+		            document.getElementById('question').value = '';  // Limpiar el campo
+		        }, 2000);
+		    });
+	</script>
+
+	
+</body>
+</html>

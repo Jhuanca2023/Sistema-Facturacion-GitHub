@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://wwww.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	
+<head th:replace="layaout/layaout :: head"></head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+          crossorigin="anonymous">
+<style>
+       /* Estilos para el menú lateral */
+       .sidebar {
+           height: 100%;
+           width: 250px; /* Ajusta el ancho según tus necesidades */
+           position: fixed;
+           top: 0;
+           left: -250px; /* Ocultar el menú inicialmente */
+           background-color: #f8f9fa; /* Color de fondo */
+           transition: 0.3s; /* Animación de apertura/cierre */
+           padding-top: 20px;
+           z-index: 1000;
+       }
+
+       .sidebar a {
+           padding: 10px 15px;
+           text-decoration: none;
+           font-size: 18px;
+           color: #000;
+           display: block;
+       }
+
+       .sidebar a:hover {
+           background-color: #ddd; /* Color de fondo al pasar el mouse */
+       }
+
+       .sidebar.active {
+           left: 0; /* Mostrar el menú cuando esté activo */
+       }
+
+       .menu-button {
+           cursor: pointer;
+       }
+   </style>
+<body>
+	<header th:replace="layaout/layaout :: header"></header>
+	<div class="container">
+		<div class="card bg-light m-4">
+			<div class="card-header bg-primary text-white" th:text="${titulo}"></div>
+			<div class="card-body">
+				<table class="table table-striped m-3">
+					<thead class="bg-dark text-white">
+						<tr>
+							<th sec:authorize="hasRole('ROLE_USER')">ID</th>
+							<th>Nombre</th>
+							<th>Apellido</th>
+							<th>Email</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Crear Factura</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Editar Cliente</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">Eliminar Cliente</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="cliente: ${clientes}">
+							<td sec:authorize="hasRole('ROLE_USER')"><a class="btn btn-primary btn-xs"
+								th:href="@{/ver/} + ${cliente.id}" th:text="${cliente.id}"></a></td>
+							<td th:text="${cliente.nombre}"></td>
+							<td th:text="${cliente.apellido}"></td>
+							<td th:text="${cliente.email}"></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-success btn-xs"
+								th:href="@{'/factura/form/' + ${cliente.id}}"
+								th:text="'Crear Factura'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-warning btn-xs"
+								th:href="@{/form/} + ${cliente.id}" th:text="'Editar Cliente'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-danger btn-xs"
+								th:href="@{/eliminar/} + ${cliente.id}"
+								th:text="'Eliminar Cliente'"></a></td>
+						</tr>
+					</tbody>
+				</table>
+				<nav th:replace="paginator-nav :: paginator"></nav>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="layaout/layaout :: footer"></footer>
+</body>
+</html>

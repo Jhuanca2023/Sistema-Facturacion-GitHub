@@ -1,0 +1,35 @@
+package com.bolsaideas.datajpa.models.service;
+
+@Service
+public class OpenAIService {
+
+    @Value("${openai.api.key}")
+    private String apiKey;
+
+    private final OpenAiClient openAiClient;
+
+    public OpenAIService(@Value("${openai.api.key}") String apiKey) {
+        this.apiKey = apiKey;
+        this.openAiClient = OpenAiClient.builder()
+                .apiKey(apiKey)
+                .build();
+    }
+
+    public void someMethod() {
+        // Define el prompt que deseas enviar a OpenAI
+        String prompt = "¿Cuál es el proceso de facturación?";
+
+        // Crea la solicitud de completado
+        CompletionRequest request = CompletionRequest.builder()
+                .prompt(prompt)
+                .maxTokens(100) // Ajusta según sea necesario
+                .build();
+
+        // Realiza la solicitud a OpenAI
+        CompletionResponse response = openAiClient.completion(request);
+
+        // Procesa la respuesta
+        String completion = response.getChoices().get(0).getText();
+        System.out.println("Respuesta de OpenAI: " + completion);
+    }
+}

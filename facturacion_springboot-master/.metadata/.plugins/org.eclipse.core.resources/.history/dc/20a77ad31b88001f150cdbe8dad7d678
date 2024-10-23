@@ -1,0 +1,37 @@
+package com.bolsaideas.datajpa.models.service;
+
+import org.springframework.stereotype.Service;
+
+import com.bolsaideas.datajpa.models.entity.Producto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class CarritoService {
+
+    private List<Producto> productosCarrito = new ArrayList<>();
+
+    public void agregarProducto(Long id) {
+        // Lógica para buscar el producto por ID y agregarlo al carrito
+        Producto producto = buscarProductoPorId(id); // Implementa este método según tu lógica
+        productosCarrito.add(producto);
+    }
+
+    public void eliminarProducto(Long id) {
+        // Lógica para eliminar el producto del carrito
+        productosCarrito.removeIf(producto -> producto.getId().equals(id));
+    }
+
+    public List<Producto> getProductosCarrito() {
+        return productosCarrito;
+    }
+
+    public void limpiarCarrito() {
+        productosCarrito.clear();
+    }
+
+    public double calcularTotal() {
+        return productosCarrito.stream().mapToDouble(producto -> producto.getPrecio()).sum();
+    }
+}
